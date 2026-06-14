@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LexiRead — Read with ease</title>
+  <style>
+    @font-face {
+      font-family: 'OpenDyslexic';
+      src: url('/fonts/OpenDyslexic-Regular.otf') format('opentype');
+      font-weight: 400;
+      font-display: swap;
+    }
+
+    @font-face {
+      font-family: 'OpenDyslexic';
+      src: url('/fonts/OpenDyslexic-Bold.otf') format('opentype');
+      font-weight: 700;
+      font-display: swap;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --ink: #0F1117;
+      --soft: #3A4060;
+      --muted: #7B82A0;
+      --blue: #4F6FED;
+      --teal: #2BBFAD;
+      --bg: #FAF8F5;
+      --white: #FFFFFF;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'OpenDyslexic', Georgia, serif;
+      background: var(--bg);
+      color: var(--ink);
+      overflow-x: hidden;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 48px;
+      background: rgba(250, 248, 245, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(79, 111, 237, .1);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--ink);
+      text-decoration: none;
+    }
+
+    .nav-logo-icon {
+      width: 34px;
+      height: 34px;
+      background: linear-gradient(135deg, var(--blue), var(--teal));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+    }
+
+    .nav-cta {
+      background: var(--blue);
+      color: white;
+      padding: 10px 22px;
+      border-radius: 99px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: background .2s, transform .15s;
+    }
+
+    .nav-cta:hover {
+      background: #3A56D4;
+      transform: translateY(-1px);
+    }
+
+    /* ── HERO ── */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 100px 24px 60px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Animated background blobs */
+    .blob {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.18;
+      animation: float 8s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .blob-1 {
+      width: 500px;
+      height: 500px;
+      background: var(--blue);
+      top: -100px;
+      left: -100px;
+      animation-delay: 0s;
+    }
+
+    .blob-2 {
+      width: 400px;
+      height: 400px;
+      background: var(--teal);
+      bottom: -80px;
+      right: -80px;
+      animation-delay: 3s;
+    }
+
+    .blob-3 {
+      width: 300px;
+      height: 300px;
+      background: #A78BFA;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation-delay: 1.5s;
+    }
+
+    @keyframes float {
+
+      0%,
+      100% {
+        transform: translateY(0) scale(1);
+      }
+
+      50% {
+        transform: translateY(-30px) scale(1.05);
+      }
+    }
+
+    .blob-2 {
+      animation-name: float2;
+    }
+
+    @keyframes float2 {
+
+      0%,
+      100% {
+        transform: translateY(0) scale(1);
+      }
+
+      50% {
+        transform: translateY(30px) scale(1.08);
+      }
+    }
+
+    /* Hero content */
+    .hero-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: var(--blue);
+      background: rgba(79, 111, 237, .1);
+      padding: 6px 16px;
+      border-radius: 99px;
+      margin-bottom: 28px;
+      animation: fadeUp .6s ease both;
+    }
+
+    .hero-eyebrow span {
+      width: 6px;
+      height: 6px;
+      background: var(--blue);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: .4;
+        transform: scale(1.4);
+      }
+    }
+
+    .hero-title {
+      font-size: clamp(38px, 7vw, 72px);
+      font-weight: 700;
+      line-height: 1.1;
+      color: var(--ink);
+      letter-spacing: -.02em;
+      margin-bottom: 24px;
+      animation: fadeUp .7s ease both;
+      animation-delay: .1s;
+    }
+
+    .hero-title .highlight {
+      background: linear-gradient(135deg, var(--blue), var(--teal));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: clamp(15px, 2vw, 19px);
+      color: var(--soft);
+      line-height: 1.8;
+      max-width: 520px;
+      margin: 0 auto 40px;
+      animation: fadeUp .7s ease both;
+      animation-delay: .2s;
+    }
+
+    .hero-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, var(--blue), var(--teal));
+      color: white;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: 700;
+      padding: 16px 36px;
+      border-radius: 99px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      animation: fadeUp .7s ease both;
+      animation-delay: .3s;
+      box-shadow: 0 8px 32px rgba(79, 111, 237, .35);
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .hero-btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 14px 40px rgba(79, 111, 237, .45);
+    }
+
+    .hero-btn svg {
+      transition: transform .2s;
+    }
+
+    .hero-btn:hover svg {
+      transform: translateX(3px);
+    }
+
+    /* ── FEATURES ── */
+    .features {
+      padding: 100px 24px;
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .section-label {
+      text-align: center;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--teal);
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: clamp(26px, 4vw, 40px);
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 56px;
+      line-height: 1.2;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 24px;
+    }
+
+    .feature-item {
+      background: var(--white);
+      border: 1px solid rgba(79, 111, 237, .1);
+      border-radius: 20px;
+      padding: 28px;
+      transition: transform .2s, box-shadow .2s;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity .5s ease, transform .5s ease, box-shadow .2s;
+    }
+
+    .feature-item.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .feature-item:hover {
+      box-shadow: 0 12px 40px rgba(79, 111, 237, .12);
+      transform: translateY(-4px);
+    }
+
+    .feature-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+
+    .feature-desc {
+      font-size: 13px;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    /* ── HOW IT WORKS ── */
+    .how {
+      background: var(--white);
+      padding: 100px 24px;
+    }
+
+    .how-inner {
+      max-width: 700px;
+      margin: 0 auto;
+    }
+
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-top: 56px;
+    }
+
+    .step {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      opacity: 0;
+      transform: translateX(-20px);
+      transition: opacity .5s ease, transform .5s ease;
+    }
+
+    .step.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    .step-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .step-num {
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--blue), var(--teal));
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .step-line {
+      width: 2px;
+      flex: 1;
+      min-height: 40px;
+      background: linear-gradient(to bottom, var(--blue), transparent);
+      margin: 6px 0;
+    }
+
+    .step:last-child .step-line {
+      display: none;
+    }
+
+    .step-content {
+      padding-bottom: 40px;
+    }
+
+    .step-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--ink);
+      margin-bottom: 6px;
+    }
+
+    .step-desc {
+      font-size: 14px;
+      color: var(--muted);
+      line-height: 1.75;
+    }
+
+    /* ── CTA ── */
+    .cta-section {
+      padding: 100px 24px;
+      text-align: center;
+    }
+
+    .cta-box {
+      max-width: 600px;
+      margin: 0 auto;
+      background: linear-gradient(135deg, var(--blue), var(--teal));
+      border-radius: 28px;
+      padding: 60px 40px;
+      color: white;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-box::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      pointer-events: none;
+    }
+
+    .cta-title {
+      font-size: clamp(24px, 4vw, 36px);
+      font-weight: 700;
+      margin-bottom: 14px;
+      position: relative;
+    }
+
+    .cta-sub {
+      font-size: 15px;
+      opacity: .85;
+      margin-bottom: 32px;
+      line-height: 1.7;
+      position: relative;
+    }
+
+    .cta-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      background: white;
+      color: var(--blue);
+      font-family: inherit;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 14px 32px;
+      border-radius: 99px;
+      text-decoration: none;
+      transition: transform .2s, box-shadow .2s;
+      position: relative;
+    }
+
+    .cta-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .2);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid rgba(79, 111, 237, .1);
+      padding: 28px 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .footer-logo {
+      font-weight: 700;
+      color: var(--ink);
+    }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(16px);
+      }
+
+      to {
+        opacity: 1;
+        transform: none;
+      }
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      nav {
+        padding: 14px 20px;
+      }
+
+      .hero {
+        padding: 90px 20px 60px;
+      }
+
+      footer {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+        padding: 24px 20px;
+      }
+
+      .cta-box {
+        padding: 40px 24px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAV -->
+  <nav>
+    <a href="/" class="nav-logo">
+      <div class="nav-logo-icon">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+        </svg>
+      </div>
+      LexiRead
+    </a>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+
+
+    <h1 class="hero-title">
+      Reading made<br>
+      <span class="highlight">easy for everyone</span>
+    </h1>
+
+    <p class="hero-sub">
+      LexiRead simplifies difficult text, reads it aloud, and helps you study — built especially for people with
+      dyslexia.
+    </p>
+
+
+
+
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features">
+    <p class="section-label">What LexiRead does</p>
+    <h2 class="section-title">Everything you need to read better</h2>
+
+    <div class="features-grid">
+      <div class="feature-item">
+        <div class="feature-name">AI Simplification</div>
+        <div class="feature-desc">Paste any complex text and get a simpler, clearer version in seconds. 10 different
+          modes to match your needs.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-name">Read Aloud</div>
+        <div class="feature-desc">Listen to any text with natural voice. Control speed, pause, and resume anytime.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-name">Document Upload</div>
+        <div class="feature-desc">Upload PDF, TXT, or DOCX files. LexiRead extracts the text and makes it readable for
+          you.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-name">Study Tools</div>
+        <div class="feature-desc">Generate MCQs, flashcards, mind maps, and cheat sheets from any text instantly.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-name">AI Chat</div>
+        <div class="feature-desc">Ask questions about anything you've uploaded. Get clear, simple answers from your AI
+          tutor.</div>
+      </div>
+      <div class="feature-item">
+        <div class="feature-name">Dyslexia Themes</div>
+        <div class="feature-desc">OpenDyslexic font, reading ruler, colour themes, and comfort spacing — all in one
+          click.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how">
+    <div class="how-inner">
+      <p class="section-label">How it works</p>
+      <h2 class="section-title">Three steps to reading with ease</h2>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-left">
+            <div class="step-num">1</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Paste or upload your text</div>
+            <div class="step-desc">Type directly, paste from anywhere, or upload a PDF, Word document, or text file.
+            </div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-left">
+            <div class="step-num">2</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Choose how you want it</div>
+            <div class="step-desc">Pick a mode — simplify it, turn it into bullet points, generate exam notes, explain
+              it like a beginner, and more.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-left">
+            <div class="step-num">3</div>
+            <div class="step-line"></div>
+          </div>
+          <div class="step-content">
+            <div class="step-title">Read, listen, or study</div>
+            <div class="step-desc">Read comfortably with dyslexia-friendly settings, listen with read-aloud, or dive
+              into AI-generated study materials.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section">
+    <div class="cta-box">
+      <h2 class="cta-title">Start reading with ease today</h2>
+      <p class="cta-sub">Free to use. No sign-up needed. Just paste your text and go.</p>
+      <a href="/app" class="cta-btn">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+        </svg>
+        Open LexiRead
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span class="footer-logo">LexiRead</span>
+    <span>Built for readers who think differently.</span>
+  </footer>
+
+  <script>
+    // Scroll reveal
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, i) => {
+        if (entry.isIntersecting) {
+          setTimeout(() => entry.target.classList.add('visible'), i * 100);
+        }
+      });
+    }, { threshold: 0.15 });
+
+    document.querySelectorAll('.feature-item, .step').forEach(el => observer.observe(el));
+  </script>
+
+</body>
+
+</html>
