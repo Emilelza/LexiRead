@@ -1193,6 +1193,12 @@ body.xl-text {
   inset: 0;
   background: rgba(0, 0, 0, .4);
   z-index: 9;
+  pointer-events: none;
+}
+
+.sidebar-overlay.visible {
+  display: block;
+  pointer-events: auto;
 }
 
 /* ── Animations ───────────────────────────────────────────── */
