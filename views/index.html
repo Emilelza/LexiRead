@@ -1,441 +1,568 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
+  <meta name="color-scheme" content="light">
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="description" content="LexiRead — AI-powered reading and study assistant for dyslexia" />
   <title>LexiRead — AI Reading Assistant</title>
   <link rel="stylesheet" href="/css/style.css" />
 </head>
+
 <body class="theme-cream">
 
-<!-- Reading ruler (overlay) -->
-<div class="reading-ruler" id="readingRuler" role="presentation" aria-hidden="true"></div>
-<div class="reading-mask" id="readingMaskTop" role="presentation" aria-hidden="true"></div>
-<div class="reading-mask" id="readingMaskBottom" role="presentation" aria-hidden="true"></div>
+  <!-- Reading ruler (overlay) -->
+  <div class="reading-ruler" id="readingRuler" role="presentation" aria-hidden="true"></div>
+  <div class="reading-mask" id="readingMaskTop" role="presentation" aria-hidden="true"></div>
+  <div class="reading-mask" id="readingMaskBottom" role="presentation" aria-hidden="true"></div>
 
-<!-- Word explainer popup -->
-<div class="word-popup-overlay hidden" id="wordPopupOverlay" role="dialog" aria-modal="true" aria-labelledby="wordPopupTitle">
-  <div class="word-popup">
-    <div class="word-popup-header">
-      <div>
-        <div class="word-popup-word" id="wordPopupTitle">—</div>
-        <div class="word-popup-pron" id="wordPopupPron"></div>
+  <!-- Word explainer popup -->
+  <div class="word-popup-overlay hidden" id="wordPopupOverlay" role="dialog" aria-modal="true"
+    aria-labelledby="wordPopupTitle">
+    <div class="word-popup">
+      <div class="word-popup-header">
+        <div>
+          <div class="word-popup-word" id="wordPopupTitle">—</div>
+          <div class="word-popup-pron" id="wordPopupPron"></div>
+        </div>
+        <button class="word-popup-close" id="wordPopupClose" aria-label="Close word explanation">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
       </div>
-      <button class="word-popup-close" id="wordPopupClose" aria-label="Close word explanation">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-      </button>
-    </div>
-    <div class="word-popup-section">
-      <div class="word-popup-label">Definition</div>
-      <div class="word-popup-text" id="wordPopupDef">Loading…</div>
-    </div>
-    <div class="word-popup-section">
-      <div class="word-popup-label">Simple explanation</div>
-      <div class="word-popup-text" id="wordPopupSimple"></div>
-    </div>
-    <div class="word-popup-section">
-      <div class="word-popup-label">Synonyms</div>
-      <div class="word-popup-synonyms" id="wordPopupSynonyms"></div>
-    </div>
-    <div class="word-popup-section">
-      <div class="word-popup-label">Example sentence</div>
-      <div class="word-popup-text" id="wordPopupExample" style="font-style:italic;"></div>
+      <div class="word-popup-section">
+        <div class="word-popup-label">Definition</div>
+        <div class="word-popup-text" id="wordPopupDef">Loading…</div>
+      </div>
+      <div class="word-popup-section">
+        <div class="word-popup-label">Simple explanation</div>
+        <div class="word-popup-text" id="wordPopupSimple"></div>
+      </div>
+      <div class="word-popup-section">
+        <div class="word-popup-label">Synonyms</div>
+        <div class="word-popup-synonyms" id="wordPopupSynonyms"></div>
+      </div>
+      <div class="word-popup-section">
+        <div class="word-popup-label">Example sentence</div>
+        <div class="word-popup-text" id="wordPopupExample" style="font-style:italic;"></div>
+      </div>
     </div>
   </div>
-</div>
 
-<!-- Toast container -->
-<div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite" aria-atomic="false"></div>
 
-<!-- App layout -->
-<div class="app-layout">
+  <!-- App layout -->
+  <div class="app-layout">
 
-  <!-- Sidebar overlay (mobile) -->
-  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <!-- Sidebar overlay (mobile) -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-  <!-- Sidebar -->
-  <aside class="sidebar" id="sidebar" aria-label="Main navigation">
-    <div class="sidebar-brand">
-      <div class="brand-icon" aria-hidden="true">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-          <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
-          <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
-        </svg>
-      </div>
-      <div>
-        <div class="brand-name">LexiRead</div>
-        <div class="brand-tag">AI Reading Assistant</div>
-      </div>
-    </div>
-
-    <nav class="sidebar-nav" aria-label="Section navigation">
-      <div class="nav-section-label">Main</div>
-      <button class="nav-item active" data-panel="reader" aria-pressed="true">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-        Text Reader
-      </button>
-      <button class="nav-item" data-panel="upload" aria-pressed="false">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="12" x2="12" y2="18"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-        Upload Document
-      </button>
-      <button class="nav-item" data-panel="study" aria-pressed="false">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        Study Tools
-      </button>
-      <button class="nav-item" data-panel="chat" aria-pressed="false">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-        AI Chat
-      </button>
-      <div class="nav-section-label" style="margin-top:12px;">Tools</div>
-      <button class="nav-item" data-panel="dashboard" aria-pressed="false">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-        Dashboard
-      </button>
-    </nav>
-  </aside>
-
-  <!-- Main -->
-  <div class="main-content">
-
-    <!-- Accessibility bar -->
-    <div class="a11y-bar" role="toolbar" aria-label="Accessibility options">
-
-      <div class="a11y-group">
-        <span class="a11y-label">Font</span>
-        <button class="a11y-btn active" id="btnDyslexicFont" title="OpenDyslexic font" aria-pressed="true">D</button>
-        <button class="a11y-btn" id="btnSystemFont" title="System font" aria-pressed="false">A</button>
+    <!-- Sidebar -->
+    <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+      <div class="sidebar-brand">
+        <div class="brand-icon" aria-hidden="true">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+          </svg>
+        </div>
+        <div>
+          <div class="brand-name">LexiRead</div>
+          <div class="brand-tag">AI Reading Assistant</div>
+        </div>
       </div>
 
-      <div class="a11y-group">
-        <span class="a11y-label">Size</span>
-        <button class="a11y-btn" id="btnFontDown" title="Decrease text size" aria-label="Decrease text size">A−</button>
-        <button class="a11y-btn" id="btnFontUp" title="Increase text size" aria-label="Increase text size">A+</button>
-      </div>
-
-      <div class="a11y-group">
-        <span class="a11y-label">Spacing</span>
-        <button class="a11y-btn" id="btnComfort" title="Comfort spacing" aria-pressed="false">≡</button>
-      </div>
-
-      <div class="a11y-group">
-        <span class="a11y-label">Focus</span>
-        <button class="a11y-btn" id="btnRuler" title="Reading ruler" aria-pressed="false">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="3" y1="12" x2="21" y2="12"/></svg>
+      <nav class="sidebar-nav" aria-label="Section navigation">
+        <div class="nav-section-label">Main</div>
+        <button class="nav-item active" data-panel="reader" aria-pressed="true">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+          </svg>
+          Text Reader
         </button>
-        <button class="a11y-btn" id="btnMask" title="Reading mask" aria-pressed="false">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="9" width="18" height="6" rx="1"/></svg>
+        <button class="nav-item" data-panel="upload" aria-pressed="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="12" y1="12" x2="12" y2="18" />
+            <line x1="9" y1="15" x2="15" y2="15" />
+          </svg>
+          Upload Document
         </button>
+        <button class="nav-item" data-panel="study" aria-pressed="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+          Study Tools
+        </button>
+        <button class="nav-item" data-panel="chat" aria-pressed="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+          </svg>
+          AI Chat
+        </button>
+        <div class="nav-section-label" style="margin-top:12px;">Tools</div>
+        <button class="nav-item" data-panel="dashboard" aria-pressed="false">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+          </svg>
+          Dashboard
+        </button>
+      </nav>
+    </aside>
+
+    <!-- Main -->
+    <div class="main-content">
+
+      <!-- Accessibility bar -->
+      <div class="a11y-bar" role="toolbar" aria-label="Accessibility options">
+
+        <div class="a11y-group">
+          <span class="a11y-label">Font</span>
+          <button class="a11y-btn active" id="btnDyslexicFont" title="OpenDyslexic font" aria-pressed="true">D</button>
+          <button class="a11y-btn" id="btnSystemFont" title="System font" aria-pressed="false">A</button>
+        </div>
+
+        <div class="a11y-group">
+          <span class="a11y-label">Size</span>
+          <button class="a11y-btn" id="btnFontDown" title="Decrease text size"
+            aria-label="Decrease text size">A−</button>
+          <button class="a11y-btn" id="btnFontUp" title="Increase text size" aria-label="Increase text size">A+</button>
+        </div>
+
+        <div class="a11y-group">
+          <span class="a11y-label">Spacing</span>
+          <button class="a11y-btn" id="btnComfort" title="Comfort spacing" aria-pressed="false">≡</button>
+        </div>
+
+        <div class="a11y-group">
+          <span class="a11y-label">Focus</span>
+          <button class="a11y-btn" id="btnRuler" title="Reading ruler" aria-pressed="false">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="3" y1="12" x2="21" y2="12" />
+            </svg>
+          </button>
+          <button class="a11y-btn" id="btnMask" title="Reading mask" aria-pressed="false">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="9" width="18" height="6" rx="1" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="a11y-group">
+          <span class="a11y-label">Theme</span>
+          <button class="theme-dot active" data-theme="theme-cream" title="Cream" aria-label="Cream theme"></button>
+          <button class="theme-dot" data-theme="theme-peach" title="Peach" aria-label="Peach theme"></button>
+          <button class="theme-dot" data-theme="theme-yellow" title="Yellow" aria-label="Yellow theme"></button>
+          <button class="theme-dot" data-theme="theme-blue" title="Blue" aria-label="Blue theme"></button>
+          <button class="theme-dot" data-theme="theme-dark" title="Dark" aria-label="Dark theme"></button>
+          <button class="theme-dot" data-theme="theme-contrast" title="High contrast"
+            aria-label="High contrast theme"></button>
+        </div>
+
       </div>
 
-      <div class="a11y-group">
-        <span class="a11y-label">Theme</span>
-        <button class="theme-dot active" data-theme="theme-cream"   title="Cream"          aria-label="Cream theme"></button>
-        <button class="theme-dot"        data-theme="theme-peach"   title="Peach"          aria-label="Peach theme"></button>
-        <button class="theme-dot"        data-theme="theme-yellow"  title="Yellow"         aria-label="Yellow theme"></button>
-        <button class="theme-dot"        data-theme="theme-blue"    title="Blue"           aria-label="Blue theme"></button>
-        <button class="theme-dot"        data-theme="theme-dark"    title="Dark"           aria-label="Dark theme"></button>
-        <button class="theme-dot"        data-theme="theme-contrast" title="High contrast" aria-label="High contrast theme"></button>
-      </div>
-
-    </div>
-
-    <!-- Top bar -->
-    <header class="topbar">
-      <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-      </button>
-      <span class="topbar-title" id="topbarTitle">Text Reader</span>
-      <div class="topbar-actions">
-        <button class="btn btn-ghost btn-sm" id="btnClearAll" title="Clear all content">Clear</button>
-      </div>
-    </header>
-
-    <!-- Page area -->
-    <main class="page-area">
-
-      <!-- ═══════════════════ READER PANEL ═══════════════════ -->
-      <section class="panel active" id="panel-reader" aria-labelledby="reader-heading">
-
-        <div class="card">
-          <h1 class="card-title" id="reader-heading">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-            Paste your text
-          </h1>
-          <p class="card-sub">Paste or type any text. Choose a mode and click Process.</p>
-
-          <label class="field-label" for="inputText">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-            Your text
-          </label>
-          <textarea id="inputText" class="tarea" placeholder="Paste anything here — an article, textbook paragraph, email, letter…" rows="7" spellcheck="false" aria-label="Input text area"></textarea>
-
-          <div class="divider"></div>
-
-          <!-- Mode selector -->
-          <div class="field-label" style="margin-bottom:10px;">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
-            Choose mode
-          </div>
-          <div class="mode-grid" id="modeGrid" role="group" aria-label="Processing mode selection">
-            <button class="mode-chip active" data-mode="easy_reader" aria-pressed="true">Easy Reader</button>
-            <button class="mode-chip" data-mode="child_friendly" aria-pressed="false">Child Friendly</button>
-            <button class="mode-chip" data-mode="student_mode" aria-pressed="false">Student Mode</button>
-            <button class="mode-chip" data-mode="academic_simplifier" aria-pressed="false">Academic</button>
-            <button class="mode-chip" data-mode="exam_notes" aria-pressed="false">Exam Notes</button>
-            <button class="mode-chip" data-mode="bullet_summary" aria-pressed="false">Bullet Summary</button>
-            <button class="mode-chip" data-mode="key_points" aria-pressed="false">Key Points</button>
-            <button class="mode-chip" data-mode="vocabulary_builder" aria-pressed="false">Vocabulary</button>
-            <button class="mode-chip" data-mode="quick_revision" aria-pressed="false">Quick Revision</button>
-            <button class="mode-chip" data-mode="beginner_mode" aria-pressed="false">Beginner Mode</button>
-          </div>
-
-          <div class="btn-row">
-            <button class="btn btn-primary" id="processBtn">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              Process Text
-            </button>
-            <button class="btn btn-ghost" id="clearInputBtn">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/></svg>
-              Clear
-            </button>
-          </div>
+      <!-- Top bar -->
+      <header class="topbar">
+        <button class="menu-toggle" id="menuToggle" aria-label="Open menu" aria-expanded="false">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="3" y1="6" x2="21" y2="6" />
+            <line x1="3" y1="12" x2="21" y2="12" />
+            <line x1="3" y1="18" x2="21" y2="18" />
+          </svg>
+        </button>
+        <span class="topbar-title" id="topbarTitle">Text Reader</span>
+        <div class="topbar-actions">
+          <button class="btn btn-ghost btn-sm" id="btnClearAll" title="Clear all content">Clear</button>
         </div>
+      </header>
 
-        <!-- Output section -->
-        <div class="card" id="outputCard" hidden>
-          <div class="card-title">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            <span id="outputModeLabel" style="color:var(--teal)">Result</span>
-          </div>
+      <!-- Page area -->
+      <main class="page-area">
 
-          <div class="output-box" id="outputText" aria-live="polite">
-            Your result will appear here.
-          </div>
+        <!-- ═══════════════════ READER PANEL ═══════════════════ -->
+        <section class="panel active" id="panel-reader" aria-labelledby="reader-heading">
 
-          <!-- TTS bar -->
-          <div class="tts-bar hidden" id="ttsBar" role="group" aria-label="Text to speech controls">
-            <button class="btn btn-ghost btn-sm" id="ttsPlay">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-              Play
-            </button>
-            <button class="btn btn-ghost btn-sm" id="ttsPause">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
-              Pause
-            </button>
-            <button class="btn btn-ghost btn-sm" id="ttsStop">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
-              Stop
-            </button>
-            <div class="tts-control">
-              Speed
-              <input type="range" class="tts-slider" id="ttsSpeed" min="0.5" max="2" step="0.1" value="0.9" aria-label="Speech speed" />
-              <span id="ttsSpeedLabel">0.9×</span>
+          <div class="card">
+            <h1 class="card-title" id="reader-heading">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+              </svg>
+              Paste your text
+            </h1>
+            <p class="card-sub">Paste or type any text. Choose a mode and click Process.</p>
+
+            <label class="field-label" for="inputText">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+              </svg>
+              Your text
+            </label>
+            <textarea id="inputText" class="tarea"
+              placeholder="Paste anything here — an article, textbook paragraph, email, letter…" rows="7"
+              spellcheck="false" aria-label="Input text area"></textarea>
+
+            <div class="divider"></div>
+
+            <!-- Mode selector -->
+            <div class="field-label" style="margin-bottom:10px;">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="3" />
+                <path
+                  d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83" />
+              </svg>
+              Choose mode
             </div>
-          </div>
-
-          <div class="output-actions">
-            <button class="btn btn-ghost btn-sm" id="readAloudBtn">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-              Read Aloud
-            </button>
-            <button class="btn btn-ghost btn-sm" id="copyOutputBtn">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              Copy
-            </button>
-            <button class="btn btn-ghost btn-sm" id="exportTxtBtn">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              Export TXT
-            </button>
-          </div>
-          <p style="font-size:var(--fs-xs);color:var(--muted);margin-top:10px;">💡 Click any word in the result to see its definition.</p>
-        </div>
-
-      </section>
-
-      <!-- ═══════════════════ UPLOAD PANEL ════════════════════ -->
-      <section class="panel" id="panel-upload" aria-labelledby="upload-heading">
-
-        <div class="card">
-          <h2 class="card-title" id="upload-heading">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-            Upload Document
-          </h2>
-          <p class="card-sub">Upload a PDF, TXT, or DOCX file to extract its text and process it with AI.</p>
-
-          <div class="upload-zone" id="uploadZone" role="button" tabindex="0" aria-label="Drop file here or click to browse">
-            <input type="file" id="fileInput" accept=".pdf,.txt,.docx" aria-label="Choose file" />
-            <div class="upload-icon" aria-hidden="true">
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <div class="mode-grid" id="modeGrid" role="group" aria-label="Processing mode selection">
+              <button class="mode-chip active" data-mode="easy_reader" aria-pressed="true">Easy Reader</button>
+              <button class="mode-chip" data-mode="child_friendly" aria-pressed="false">Child Friendly</button>
+              <button class="mode-chip" data-mode="student_mode" aria-pressed="false">Student Mode</button>
+              <button class="mode-chip" data-mode="academic_simplifier" aria-pressed="false">Academic</button>
+              <button class="mode-chip" data-mode="exam_notes" aria-pressed="false">Exam Notes</button>
+              <button class="mode-chip" data-mode="bullet_summary" aria-pressed="false">Bullet Summary</button>
+              <button class="mode-chip" data-mode="key_points" aria-pressed="false">Key Points</button>
+              <button class="mode-chip" data-mode="vocabulary_builder" aria-pressed="false">Vocabulary</button>
+              <button class="mode-chip" data-mode="quick_revision" aria-pressed="false">Quick Revision</button>
+              <button class="mode-chip" data-mode="beginner_mode" aria-pressed="false">Beginner Mode</button>
             </div>
-            <div class="upload-title">Drop your file here</div>
-            <div class="upload-sub">or <strong>click to browse</strong></div>
-            <div class="upload-types">PDF · TXT · DOCX · Max 10 MB</div>
-          </div>
 
-          <div class="progress-bar" id="progressBar" aria-hidden="true">
-            <div class="progress-fill" id="progressFill"></div>
-          </div>
-
-          <div id="uploadStatus" aria-live="polite" style="margin-top:12px;font-size:var(--fs-sm);color:var(--muted);"></div>
-        </div>
-
-        <div class="card" id="uploadResultCard" hidden>
-          <div class="card-title">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            <span style="color:var(--teal)">Extracted Text</span>
-            <span id="uploadWordCount" style="margin-left:auto;font-size:var(--fs-xs);font-weight:400;color:var(--muted);"></span>
-          </div>
-          <div class="output-box" id="uploadExtracted" style="max-height:300px;overflow-y:auto;"></div>
-          <div class="btn-row" style="margin-top:14px;">
-            <button class="btn btn-primary btn-sm" id="sendToReaderBtn">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-              Open in Reader
-            </button>
-            <button class="btn btn-ghost btn-sm" id="sendToStudyBtn">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/></svg>
-              Open in Study Tools
-            </button>
-            <button class="btn btn-ghost btn-sm" id="sendToChatBtn">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-              Chat about it
-            </button>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- ═══════════════════ STUDY PANEL ═════════════════════ -->
-      <section class="panel" id="panel-study" aria-labelledby="study-heading">
-
-        <div class="card">
-          <h2 class="card-title" id="study-heading">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            Study Tools
-          </h2>
-          <p class="card-sub">Generate study materials from any text — MCQs, flashcards, mind maps, and more.</p>
-
-          <label class="field-label" for="studyInput">Your text</label>
-          <textarea id="studyInput" class="tarea" rows="6" placeholder="Paste the text you want to study…" aria-label="Study text input"></textarea>
-
-          <div class="divider"></div>
-
-          <div class="field-label" style="margin-bottom:10px;">Generate</div>
-          <div class="mode-grid" id="studyTypeGrid" role="group" aria-label="Study material type">
-            <button class="mode-chip active" data-type="mcq" aria-pressed="true">MCQ Questions</button>
-            <button class="mode-chip" data-type="flashcards" aria-pressed="false">Flashcards</button>
-            <button class="mode-chip" data-type="viva_questions" aria-pressed="false">Viva Questions</button>
-            <button class="mode-chip" data-type="mind_map" aria-pressed="false">Mind Map</button>
-            <button class="mode-chip" data-type="cheat_sheet" aria-pressed="false">Cheat Sheet</button>
-          </div>
-
-          <div class="btn-row">
-            <button class="btn btn-primary" id="generateStudyBtn">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              Generate
-            </button>
-          </div>
-        </div>
-
-        <div class="card" id="studyResultCard" hidden>
-          <div class="card-title">
-            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg>
-            <span style="color:var(--teal)" id="studyResultLabel">Study Material</span>
-          </div>
-          <div class="output-box" id="studyOutput"></div>
-          <div class="output-actions">
-            <button class="btn btn-ghost btn-sm" id="copyStudyBtn">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-              Copy
-            </button>
-            <button class="btn btn-ghost btn-sm" id="exportStudyBtn">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-              Export TXT
-            </button>
-          </div>
-        </div>
-
-      </section>
-
-      <!-- ═══════════════════ CHAT PANEL ══════════════════════ -->
-      <section class="panel" id="panel-chat" aria-labelledby="chat-heading">
-
-        <div class="card">
-          <h2 class="card-title" id="chat-heading">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-            AI Study Chat
-          </h2>
-          <p class="card-sub">Ask questions about any text or topic. If you loaded a document, the AI will answer from it.</p>
-
-          <div id="chatContextBadge" style="margin-bottom:14px;display:none;">
-            <span style="font-size:var(--fs-xs);padding:4px 10px;background:var(--teal-bg);border:1px solid var(--teal-border);border-radius:var(--r-pill);color:var(--teal);font-weight:700;">
-              📄 Document loaded
-            </span>
-            <button id="clearChatContext" style="background:none;border:none;cursor:pointer;font-size:var(--fs-xs);color:var(--muted);margin-left:8px;text-decoration:underline;">Remove</button>
-          </div>
-
-          <div class="chat-window" aria-label="Chat messages">
-            <div class="chat-messages" id="chatMessages" role="log" aria-live="polite">
-              <div class="chat-bubble ai">👋 Hello! I'm your LexiRead study assistant. Paste some text or upload a document, then ask me anything about it. I can explain concepts, answer questions, and help you study.</div>
-            </div>
-            <div class="chat-input-row">
-              <textarea class="chat-input" id="chatInput" rows="1" placeholder="Ask a question…" aria-label="Chat message input"></textarea>
-              <button class="chat-send" id="chatSend" aria-label="Send message">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            <div class="btn-row">
+              <button class="btn btn-primary" id="processBtn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
+                Process Text
+              </button>
+              <button class="btn btn-ghost" id="clearInputBtn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6l-1 14H6L5 6" />
+                </svg>
+                Clear
               </button>
             </div>
           </div>
 
-          <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
-            <button class="btn btn-ghost btn-sm" id="clearChatBtn">Clear chat</button>
+          <!-- Output section -->
+          <div class="card" id="outputCard" hidden>
+            <div class="card-title">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span id="outputModeLabel" style="color:var(--teal)">Result</span>
+            </div>
+
+            <div class="output-box" id="outputText" aria-live="polite">
+              Your result will appear here.
+            </div>
+
+            <!-- TTS bar -->
+            <div class="tts-bar hidden" id="ttsBar" role="group" aria-label="Text to speech controls">
+              <button class="btn btn-ghost btn-sm" id="ttsPlay">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="5 3 19 12 5 21 5 3" />
+                </svg>
+                Play
+              </button>
+              <button class="btn btn-ghost btn-sm" id="ttsPause">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="6" y="4" width="4" height="16" />
+                  <rect x="14" y="4" width="4" height="16" />
+                </svg>
+                Pause
+              </button>
+              <button class="btn btn-ghost btn-sm" id="ttsStop">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="3" y="3" width="18" height="18" rx="2" />
+                </svg>
+                Stop
+              </button>
+              <div class="tts-control">
+                Speed
+                <input type="range" class="tts-slider" id="ttsSpeed" min="0.5" max="2" step="0.1" value="0.9"
+                  aria-label="Speech speed" />
+                <span id="ttsSpeedLabel">0.9×</span>
+              </div>
+            </div>
+
+            <div class="output-actions">
+              <button class="btn btn-ghost btn-sm" id="readAloudBtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+                  <path d="M19.07 4.93a10 10 0 0 1 0 14.14" />
+                  <path d="M15.54 8.46a5 5 0 0 1 0 7.07" />
+                </svg>
+                Read Aloud
+              </button>
+              <button class="btn btn-ghost btn-sm" id="copyOutputBtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
+                Copy
+              </button>
+              <button class="btn btn-ghost btn-sm" id="exportTxtBtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                </svg>
+                Export TXT
+              </button>
+            </div>
+            <p style="font-size:var(--fs-xs);color:var(--muted);margin-top:10px;">💡 Click any word in the result to see
+              its definition.</p>
           </div>
-        </div>
 
-      </section>
+        </section>
 
-      <!-- ═══════════════════ DASHBOARD PANEL ═════════════════ -->
-      <section class="panel" id="panel-dashboard" aria-labelledby="dashboard-heading">
+        <!-- ═══════════════════ UPLOAD PANEL ════════════════════ -->
+        <section class="panel" id="panel-upload" aria-labelledby="upload-heading">
 
-        <div class="card">
-          <h2 class="card-title" id="dashboard-heading">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            Your Dashboard
-          </h2>
-          <p class="card-sub">Your activity for this session.</p>
+          <div class="card">
+            <h2 class="card-title" id="upload-heading">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                <polyline points="14 2 14 8 20 8" />
+              </svg>
+              Upload Document
+            </h2>
+            <p class="card-sub">Upload a PDF, TXT, or DOCX file to extract its text and process it with AI.</p>
 
-          <div class="stats-grid" id="statsGrid">
-            <div class="stat-card">
-              <div class="stat-number" id="statSimplifications">0</div>
-              <div class="stat-label">Processed</div>
+            <div class="upload-zone" id="uploadZone" role="button" tabindex="0"
+              aria-label="Drop file here or click to browse">
+              <input type="file" id="fileInput" accept=".pdf,.txt,.docx" aria-label="Choose file" />
+              <div class="upload-icon" aria-hidden="true">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="17 8 12 3 7 8" />
+                  <line x1="12" y1="3" x2="12" y2="15" />
+                </svg>
+              </div>
+              <div class="upload-title">Drop your file here</div>
+              <div class="upload-sub">or <strong>click to browse</strong></div>
+              <div class="upload-types">PDF · TXT · DOCX · Max 10 MB</div>
             </div>
-            <div class="stat-card">
-              <div class="stat-number" id="statStudyGenerated">0</div>
-              <div class="stat-label">Study Sets</div>
+
+            <div class="progress-bar" id="progressBar" aria-hidden="true">
+              <div class="progress-fill" id="progressFill"></div>
             </div>
-            <div class="stat-card">
-              <div class="stat-number" id="statDocsUploaded">0</div>
-              <div class="stat-label">Documents</div>
+
+            <div id="uploadStatus" aria-live="polite"
+              style="margin-top:12px;font-size:var(--fs-sm);color:var(--muted);"></div>
+          </div>
+
+          <div class="card" id="uploadResultCard" hidden>
+            <div class="card-title">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span style="color:var(--teal)">Extracted Text</span>
+              <span id="uploadWordCount"
+                style="margin-left:auto;font-size:var(--fs-xs);font-weight:400;color:var(--muted);"></span>
             </div>
-            <div class="stat-card">
-              <div class="stat-number" id="statChatMessages">0</div>
-              <div class="stat-label">Chat Messages</div>
+            <div class="output-box" id="uploadExtracted" style="max-height:300px;overflow-y:auto;"></div>
+            <div class="btn-row" style="margin-top:14px;">
+              <button class="btn btn-primary btn-sm" id="sendToReaderBtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+                  <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+                </svg>
+                Open in Reader
+              </button>
+              <button class="btn btn-ghost btn-sm" id="sendToStudyBtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                </svg>
+                Open in Study Tools
+              </button>
+              <button class="btn btn-ghost btn-sm" id="sendToChatBtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
+                Chat about it
+              </button>
             </div>
           </div>
-        </div>
 
-        <div class="card">
-          <div class="card-title">Recent Activity</div>
-          <ul class="activity-list" id="activityList" aria-label="Recent activity">
-            <li class="activity-item" style="color:var(--muted);font-style:italic;">No activity yet. Start by processing some text!</li>
-          </ul>
-        </div>
+        </section>
 
-      </section>
+        <!-- ═══════════════════ STUDY PANEL ═════════════════════ -->
+        <section class="panel" id="panel-study" aria-labelledby="study-heading">
 
-    </main>
+          <div class="card">
+            <h2 class="card-title" id="study-heading">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
+                <line x1="12" y1="17" x2="12.01" y2="17" />
+              </svg>
+              Study Tools
+            </h2>
+            <p class="card-sub">Generate study materials from any text — MCQs, flashcards, mind maps, and more.</p>
+
+            <label class="field-label" for="studyInput">Your text</label>
+            <textarea id="studyInput" class="tarea" rows="6" placeholder="Paste the text you want to study…"
+              aria-label="Study text input"></textarea>
+
+            <div class="divider"></div>
+
+            <div class="field-label" style="margin-bottom:10px;">Generate</div>
+            <div class="mode-grid" id="studyTypeGrid" role="group" aria-label="Study material type">
+              <button class="mode-chip active" data-type="mcq" aria-pressed="true">MCQ Questions</button>
+              <button class="mode-chip" data-type="flashcards" aria-pressed="false">Flashcards</button>
+              <button class="mode-chip" data-type="viva_questions" aria-pressed="false">Viva Questions</button>
+              <button class="mode-chip" data-type="mind_map" aria-pressed="false">Mind Map</button>
+              <button class="mode-chip" data-type="cheat_sheet" aria-pressed="false">Cheat Sheet</button>
+            </div>
+
+            <div class="btn-row">
+              <button class="btn btn-primary" id="generateStudyBtn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
+                </svg>
+                Generate
+              </button>
+            </div>
+          </div>
+
+          <div class="card" id="studyResultCard" hidden>
+            <div class="card-title">
+              <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--teal)" stroke-width="2">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              <span style="color:var(--teal)" id="studyResultLabel">Study Material</span>
+            </div>
+            <div class="output-box" id="studyOutput"></div>
+            <div class="output-actions">
+              <button class="btn btn-ghost btn-sm" id="copyStudyBtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <rect x="9" y="9" width="13" height="13" rx="2" />
+                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+                </svg>
+                Copy
+              </button>
+              <button class="btn btn-ghost btn-sm" id="exportStudyBtn">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <polyline points="14 2 14 8 20 8" />
+                </svg>
+                Export TXT
+              </button>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ═══════════════════ CHAT PANEL ══════════════════════ -->
+        <section class="panel" id="panel-chat" aria-labelledby="chat-heading">
+
+          <div class="card">
+            <h2 class="card-title" id="chat-heading">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+              </svg>
+              AI Study Chat
+            </h2>
+            <p class="card-sub">Ask questions about any text or topic. If you loaded a document, the AI will answer from
+              it.</p>
+
+            <div id="chatContextBadge" style="margin-bottom:14px;display:none;">
+              <span
+                style="font-size:var(--fs-xs);padding:4px 10px;background:var(--teal-bg);border:1px solid var(--teal-border);border-radius:var(--r-pill);color:var(--teal);font-weight:700;">
+                📄 Document loaded
+              </span>
+              <button id="clearChatContext"
+                style="background:none;border:none;cursor:pointer;font-size:var(--fs-xs);color:var(--muted);margin-left:8px;text-decoration:underline;">Remove</button>
+            </div>
+
+            <div class="chat-window" aria-label="Chat messages">
+              <div class="chat-messages" id="chatMessages" role="log" aria-live="polite">
+                <div class="chat-bubble ai">👋 Hello! I'm your LexiRead study assistant. Paste some text or upload a
+                  document, then ask me anything about it. I can explain concepts, answer questions, and help you study.
+                </div>
+              </div>
+              <div class="chat-input-row">
+                <textarea class="chat-input" id="chatInput" rows="1" placeholder="Ask a question…"
+                  aria-label="Chat message input"></textarea>
+                <button class="chat-send" id="chatSend" aria-label="Send message">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="22" y1="2" x2="11" y2="13" />
+                    <polygon points="22 2 15 22 11 13 2 9 22 2" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div style="margin-top:10px;display:flex;gap:8px;flex-wrap:wrap;">
+              <button class="btn btn-ghost btn-sm" id="clearChatBtn">Clear chat</button>
+            </div>
+          </div>
+
+        </section>
+
+        <!-- ═══════════════════ DASHBOARD PANEL ═════════════════ -->
+        <section class="panel" id="panel-dashboard" aria-labelledby="dashboard-heading">
+
+          <div class="card">
+            <h2 class="card-title" id="dashboard-heading">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <rect x="3" y="3" width="7" height="7" />
+                <rect x="14" y="3" width="7" height="7" />
+                <rect x="14" y="14" width="7" height="7" />
+                <rect x="3" y="14" width="7" height="7" />
+              </svg>
+              Your Dashboard
+            </h2>
+            <p class="card-sub">Your activity for this session.</p>
+
+            <div class="stats-grid" id="statsGrid">
+              <div class="stat-card">
+                <div class="stat-number" id="statSimplifications">0</div>
+                <div class="stat-label">Processed</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number" id="statStudyGenerated">0</div>
+                <div class="stat-label">Study Sets</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number" id="statDocsUploaded">0</div>
+                <div class="stat-label">Documents</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-number" id="statChatMessages">0</div>
+                <div class="stat-label">Chat Messages</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title">Recent Activity</div>
+            <ul class="activity-list" id="activityList" aria-label="Recent activity">
+              <li class="activity-item" style="color:var(--muted);font-style:italic;">No activity yet. Start by
+                processing some text!</li>
+            </ul>
+          </div>
+
+        </section>
+
+      </main>
+    </div>
   </div>
-</div>
 
-<script src="/js/app.js"></script>
+  <script src="/js/app.js"></script>
 </body>
+
 </html>
