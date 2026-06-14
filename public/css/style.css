@@ -3,6 +3,13 @@
    ============================================================ */
 
 /* OpenDyslexic font faces */
+@media (prefers-color-scheme: dark) {
+  body:not(.theme-dark):not(.theme-contrast) {
+    background: var(--bg) !important;
+    color: var(--ink) !important;
+  }
+}
+
 @font-face {
   font-family: 'OpenDyslexic';
   src: url('/fonts/OpenDyslexic-Regular.otf') format('opentype');
@@ -173,7 +180,7 @@ body {
   font-size: var(--fs-body);
   line-height: var(--line-height);
   color: var(--ink);
-  background: var(--bg);
+  background: #FAF8F5;
   min-height: 100vh;
   transition: background .3s var(--ease), color .3s var(--ease);
   -webkit-font-smoothing: antialiased;
